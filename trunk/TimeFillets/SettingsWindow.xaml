@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TimeFillets.MainApplication.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Settings" Height="500" Width="500"
+        Title="TimeFillets - Settings" Height="500" Width="500"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         >
     <Grid>
