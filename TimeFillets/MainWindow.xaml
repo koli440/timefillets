@@ -1,0 +1,85 @@
+﻿<Window x:Class="TimeFillets.MainApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:TimeFillets.ViewModel;assembly=TimeFillets.ViewModel"
+        Title="Google Calendar Time Sheet" Height="768" Width="1024">
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCommand_CanExecute" Executed="CloseCommand_Executed"></CommandBinding>
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <Menu>
+                <MenuItem Header="_File">
+                    <MenuItem Command="{Binding Path=RefreshCalendarCommand.Command}" Header="{Binding Path=RefreshCalendarCommand.DisplayName}" IsEnabled="{Binding Path=RefreshCalendarCommand.Command.CanExecute}"></MenuItem>
+                    <Separator></Separator>
+                    <MenuItem Command="ApplicationCommands.Close" Header="_Close"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem Command="{Binding Path=ProjectDefinitionsCommand.Command}" Header="{Binding Path=ProjectDefinitionsCommand.DisplayName}" IsEnabled="{Binding Path=ProjectDefinitionsCommand.Command.CanExecute}"></MenuItem>
+                    <MenuItem Command="{Binding Path=SettingsCommand.Command}" Header="{Binding Path=SettingsCommand.DisplayName}"></MenuItem>
+                </MenuItem>
+            </Menu>
+            <Expander>
+                <Expander.Header>General</Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Period from:</Label>
+                    <DatePicker Name="PeriodFromDatePicker" SelectedDate="{Binding Path=From}"></DatePicker>
+                    <Label>To:</Label>
+                    <DatePicker Name="PeriodToDatePicker" SelectedDate="{Binding Path=To}"></DatePicker>
+                    <Button Name="RefreshItemsButton" Command="{Binding Path=RefreshCalendarCommand.Command}" Content="{Binding Path=RefreshCalendarCommand.DisplayName}"></Button>
+                </StackPanel>
+            </Expander>
+            <Expander IsExpanded="True">
+                <Expander.Header>Search</Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Search</Label>
+                    <TextBox Name="SearchTextBox" Width="200" Text="{Binding Path=SearchPhrase}"></TextBox>
+                    <Label>in</Label>
+                    <ComboBox Name="SearchInComboBox" SelectedValue="{Binding Path=SearchIn, Mode=TwoWay}" SelectedValuePath="Tag">
+                        <ComboBox.Items>
+                            <ComboBoxItem Tag="Title">Event name</ComboBoxItem>
+                            <ComboBoxItem Tag="Customer">Customer</ComboBoxItem>
+                            <ComboBoxItem Tag="Project">Project</ComboBoxItem>
+                            <ComboBoxItem Tag="Task">Task</ComboBoxItem>
+                            <ComboBoxItem Tag="StartedBefore">Started before</ComboBoxItem>
+                            <ComboBoxItem Tag="StartedAfter">Started after</ComboBoxItem>
+                            <ComboBoxItem Tag="EndedBefore">Ended before</ComboBoxItem>
+                            <ComboBoxItem Tag="EndedAfter">Ended after</ComboBoxItem>
+                        </ComboBox.Items>
+                    </ComboBox>
+                    <Button Name="SearchButton" Command="{Binding Path=SearchCommand.Command}" Content="{Binding Path=SearchCommand.DisplayName}"></Button>
+                </StackPanel>
+            </Expander>
+            <Expander IsExpanded="False">
+                <Expander.Header>Export</Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Format</Label>
+                    <ComboBox x:Name="ExportFormatComboBox" SelectedValuePath="Tag" SelectedValue="{Binding Path=ExportType}">
+                        <ComboBoxItem Tag=".xlsx" IsSelected="True">Excel (.xlsx)</ComboBoxItem>
+                    </ComboBox>
+                    <Label>File Name</Label>
+                    <TextBox x:Name="FilePathTextBox" Width="300" Text="{Binding Path=ExportPath}"></TextBox>
+                    <Button x:Name="FilePathBrowseButton" Click="FilePathBrowseButton_Click">Browse</Button>
+                    <Button x:Name="ExportButton" Command="{Binding Path=ExportCommand.Command}" Content="{Binding Path=ExportCommand.DisplayName}"></Button>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+        <ListView Grid.Row="1"  Name="ItemsListView" ItemsSource="{Binding Path=CalendarItems}" ScrollViewer.CanContentScroll="True">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Event Name" DisplayMemberBinding="{Binding Title}" />
+                    <GridViewColumn Header="Customer" DisplayMemberBinding="{Binding CustomerItem.Name}" />
+                    <GridViewColumn Header="Project" DisplayMemberBinding="{Binding ProjectItem.Name}" />
+                    <GridViewColumn Header="Task" DisplayMemberBinding="{Binding TaskItem.Name}" />
+                    <GridViewColumn Header="Begins at" DisplayMemberBinding="{Binding StartDate}" />
+                    <GridViewColumn Header="Ends at" DisplayMemberBinding="{Binding EndDate}" />
+                    <GridViewColumn Header="Duration" DisplayMemberBinding="{Binding Duration}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>

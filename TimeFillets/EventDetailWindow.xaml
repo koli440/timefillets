@@ -1,0 +1,100 @@
+﻿<Window x:Class="TimeFillets.MainApplication.EventDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:TimeFillets.ViewModel;assembly=TimeFillets.ViewModel"
+        Title="Event Detail" Height="600" Width="800" x:Name="EventDetail">
+    <StackPanel>
+        <Expander IsExpanded="True">
+            <Expander.Header>General</Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0">Title</Label>
+                <TextBox Grid.Column="1" Grid.Row="0" x:Name="NameTextBox" Text="{Binding Path=EventItem.Title, Mode=TwoWay}"></TextBox>
+                <Label Grid.Column="0" Grid.Row="1">Description</Label>
+                <TextBox Grid.Column="1" Grid.Row="1" x:Name="DescriptionTextBox" Text="{Binding Path=EventItem.Description, Mode=TwoWay}"></TextBox>
+            </Grid>
+        </Expander>
+        <Expander IsExpanded="True">
+            <Expander.Header>Event Properties</Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0">Start At</Label>
+                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
+                    <DatePicker  Name="StartAtDatePicker" SelectedDate="{Binding Path=EventItem.StartDate, Mode=OneWay}"></DatePicker>
+                    <TextBox Name="StartAtTimeTextBox" Text="{Binding Path=StartTime, Mode=OneWay}" ></TextBox>
+                </StackPanel>
+                <Label Grid.Column="0" Grid.Row="1">End At</Label>
+                <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                    <DatePicker Name="EndAtDatePicker" SelectedDate="{Binding Path=EventItem.EndDate, Mode=OneWay}"></DatePicker>
+                    <TextBox Name="EndAtTimeTextBox" Text="{Binding Path=EndTime, Mode=OneWay}" ></TextBox>
+                </StackPanel>
+                <Label Grid.Column="0" Grid.Row="2">Duration</Label>
+                <TextBox Grid.Column="1" Grid.Row="2" Name="DurationTextBox" Text="{Binding Path=EventItem.Duration, Mode=OneWay}"></TextBox>
+                <Label Grid.Column="0" Grid.Row="3">Location</Label>
+                <TextBox Grid.Column="1" Grid.Row="3" Name="LocationTextBox" Text="{Binding Path=EventItem.Location, Mode=TwoWay}"></TextBox>
+            </Grid>
+        </Expander>
+        <Expander IsExpanded="True">
+            <Expander.Header>Project Properties</Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0">Customer</Label>
+                <TextBox Grid.Column="1" Grid.Row="0" Name="CustomerTextBox" Text="{Binding Path=EventItem.CustomerItem.Name, Mode=TwoWay}"></TextBox>
+                <Label Grid.Column="0" Grid.Row="1">Project</Label>
+                <TextBox Grid.Column="1" Grid.Row="1" Name="ProjectTextBox" Text="{Binding Path=EventItem.ProjectItem.Name, Mode=TwoWay}"></TextBox>
+                <Label Grid.Column="0" Grid.Row="2">Location</Label>
+                <TextBox Grid.Column="1" Grid.Row="2" Name="TaskTextBox" Text="{Binding Path=EventItem.TaskItem.Name, Mode=TwoWay}"></TextBox>
+            </Grid>
+        </Expander>
+        <Expander IsExpanded="True">
+            <Expander.Header>Other Properties</Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0">Is Repeating</Label>
+                <ComboBox Grid.Column="1" Grid.Row="0" Name="IsRepeatingComboBox" SelectedValuePath="Tag" SelectedValue="{Binding Path=EventItem.IsRepeating, Mode=TwoWay}">
+                    <ComboBox.Items>
+                        <ComboBoxItem Tag="True">True</ComboBoxItem>
+                        <ComboBoxItem Tag="False">False</ComboBoxItem>
+                    </ComboBox.Items>
+                </ComboBox>
+                <Label Grid.Column="0" Grid.Row="1">Updated</Label>
+                <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                    <DatePicker Name="UpdatedDatePicker" SelectedDate="{Binding Path=EventItem.Updated, Mode=OneWay}"></DatePicker>
+                    <TextBox Name="UpdatedTimeTextBox" Text="{Binding Path=UpdatedTime, Mode=OneWay}" ></TextBox>
+                </StackPanel>
+            </Grid>
+        </Expander>
+        <Button x:Name="SaveButton" Command="{Binding Path=SaveCommand.Command}" Content="{Binding Path=SaveCommand.DisplayName}"></Button>
+    </StackPanel>
+</Window>

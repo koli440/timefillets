@@ -1,0 +1,40 @@
+﻿<Window x:Class="TimeFillets.MainApplication.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings" Height="500" Width="500"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        >
+    <Grid>
+        <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0">Calendar Url</Label>
+                <TextBox Grid.Row="0" Grid.Column="1" Name="CalendarUrlTextBox" Text="{Binding Path=CalendarUrl, Mode=TwoWay}"></TextBox>
+                <Label Grid.Row="1" Grid.Column="0">User Name</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="UserNameTextBox" Text="{Binding Path=UserName, Mode=TwoWay}"></TextBox>
+                <Label Grid.Row="2" Grid.Column="0">Password</Label>
+                <TextBox Grid.Row="2" Grid.Column="1" Name="PasswordTextBox" Text="{Binding Path=Password, Mode=TwoWay}"></TextBox>
+                <Label Grid.Row="3" Grid.Column="0">Use Proxy</Label>
+                <CheckBox Grid.Row="3" Grid.Column="1" Name="UseProxyCheckBox" IsChecked="{Binding Path=ProxyInUse, Mode=TwoWay}"></CheckBox>
+                <Label Grid.Row="4" Grid.Column="0">Proxy Domain</Label>
+                <TextBox Grid.Row="4" Grid.Column="1" Name="ProxyDomainTextBox" Text="{Binding Path=ProxyDomain, Mode=TwoWay}"></TextBox>
+                <Label Grid.Row="5" Grid.Column="0">Proxy User Name</Label>
+                <TextBox Grid.Row="5" Grid.Column="1" Name="ProxyUserNameTextBox" Text="{Binding Path=ProxyUserName, Mode=TwoWay}"></TextBox>
+                <Label Grid.Row="6" Grid.Column="0">Proxy Password</Label>
+                <TextBox Grid.Row="6" Grid.Column="1" Name="ProxyPasswordTextBox" Text="{Binding Path=ProxyPassword, Mode=TwoWay}"></TextBox>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

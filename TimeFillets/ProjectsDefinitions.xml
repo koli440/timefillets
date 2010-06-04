@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<projectsDefinitions>
+  <customer name="Cody">
+    <project name="Configurable Slot Machine">
+      <task name="Audio"></task>
+    </project>
+  </customer>
+  <customer name="SoulFilets">
+    <project name="Google Calendar Time Sheet">
+      <task name="Configurace"></task>
+      <task name="Propojeni na projekty a zakazniky"></task>
+      <task name="Predelani metadat z Title do Description"></task>
+    </project>
+    <project name="Test project">
+      <task name="Test task 1"></task>
+      <task name="Test task 2"></task>
+      <task name="Test task 3"></task>
+    </project>
+  </customer>
+</projectsDefinitions>
