@@ -1,0 +1,11 @@
+#summary Name of Customer
+#labels Phase-Support
+
+= Introduction =
+
+Name of Customer.
+
+
+= Details =
+
+Based on this name events are associated with Customer.
