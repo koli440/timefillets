@@ -1,0 +1,12 @@
+#summary How to add marking string to Google calendar to make Event associated with Customer (Project, Task)
+#labels Phase-Support
+
+= Introduction =
+This article shows how to add a marking string to associate Event in Google calendar with coresponding Customer, Project and Task.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
