@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections;
 using System.Xml;
+using System.Configuration;
 
 namespace TimeFillets.Connectors
 {
@@ -17,7 +18,7 @@ namespace TimeFillets.Connectors
   public class ProjectDefinitionsConnector
   {
     private List<Customer> scannedItems;
-    private readonly string projectDefinitionsFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SoulFilets\\GoogleCalendarTimeSheet\\ProjectsDefinitions.xml";
+    private readonly string projectDefinitionsFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + ConfigurationManager.AppSettings["ProjectDefinitionPath"];
 
     /// <summary>
     /// Default constructor
