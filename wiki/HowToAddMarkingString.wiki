@@ -6,7 +6,8 @@ This article shows how to add a marking string to associate Event in Google cale
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+In order to associate a Event to some Customer, Project and Task it needs to be marked by string in given format. This string must be stored in Events description.
+
+Format of this string can be configured in application configuration, but by default it has this format:
+
+*{customer:CustomerName}{project:ProjectName}{task:TaskName}*
