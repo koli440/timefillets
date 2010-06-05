@@ -1,0 +1,11 @@
+#summary Name of Task.
+#labels Phase-Support
+
+= Introduction =
+
+Name of Task.
+
+
+= Details =
+
+This string identifies task, that is associated with Event.
