@@ -1,0 +1,15 @@
+#summary TimeFillets - simply manage time spend.
+#labels Phase-Support
+
+= Introduction =
+
+TimeFillets is application, which purpose is to manage time spend when working on Task.
+
+
+= Details =
+
+Main purpose of TimeFillets application is to manage and associate time spend on Task in Project for Customer. It`s based on top of Google Calendar and uses a [Google Calendar API http://code.google.com/apis/calendar/] to connect into it.
+
+Users can mark time by inserting a special marking string into Google Calendar description. It associates this Event with specified Customer, Project and Task.
+
+TimeFillets is a Windows application writen in C# (.NET framework).
