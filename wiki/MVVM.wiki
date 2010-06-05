@@ -1,0 +1,11 @@
+#summary Desing pattern.
+#labels Phase-Support
+
+= Introduction =
+
+Design pattern used in TimeFillets.
+
+
+= Details =
+
+[http://en.wikipedia.org/wiki/Model_View_ViewModel]
