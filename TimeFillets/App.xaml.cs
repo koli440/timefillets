@@ -35,7 +35,7 @@ namespace TimeFillets.MainApplication
 
       var viewModel = new MainWindowViewModel(calendarConnector, projectDefinitionsCommand, settingsCommand, itemDetailCommand, errorHelper);
 
-      string excelTemplatePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\SoulFilets\\GoogleCalendarTimeSheet\\TimesheetTemplate.xlsx";
+      string excelTemplatePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + ConfigurationManager.AppSettings["ExcelTemplatePath"];
       IExportConnector excelExportConnector = new ExcelSheetConnector(excelTemplatePath);
       List<IExportConnector> exportConnectors = new List<IExportConnector>();
       exportConnectors.Add(excelExportConnector);
