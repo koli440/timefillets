@@ -21,13 +21,14 @@ namespace TimeFillets.Model
     /// </summary>
     public string Description { get; set; }
 
+    /// <summary>
+    /// Description cleaned of definition strings.
+    /// </summary>
     public string CleanDescription
     {
       get
       {
-        return this.Description.Replace(ProjectSettings.GetCustomerString(this.CustomerItem.Name), "")
-          .Replace(ProjectSettings.GetProjectString(this.ProjectItem.Name), "")
-          .Replace(ProjectSettings.GetTaskString(this.TaskItem.Name), "");
+        return ProjectSettings.ClearText(this.Description);
       }
     }
 
@@ -104,6 +105,9 @@ namespace TimeFillets.Model
     {
       this.StartDate = DateTime.Now;
       this.EndDate = DateTime.Now.AddHours(0.5);
+      this.CustomerItem = new Customer();
+      this.ProjectItem = new Project();
+      this.TaskItem = new Task();
     }
 
   }
