@@ -38,7 +38,7 @@ namespace TimeFillets.MainApplication
     void ItemsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
       MainWindowViewModel viewModel = (MainWindowViewModel)this.DataContext;
-      viewModel.ItemDetailCommand.Command.Execute((CalendarItem)ItemsListView.SelectedItem);
+      viewModel.ItemDetailCommand.Command.Execute(new EventDetailParameters() { SelectedItem = (CalendarItem)ItemsListView.SelectedItem, MainWindow = (MainWindowViewModel)this.DataContext });
     }
 
     private void CloseCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -67,6 +67,13 @@ namespace TimeFillets.MainApplication
       {
         ((MainWindowViewModel)DataContext).ExportPath = dialog.FileName;
       }
+    }
+
+    private void CreateEventMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+      MainWindowViewModel viewModel = (MainWindowViewModel)this.DataContext;
+      CalendarItem newItem = new CalendarItem();
+      viewModel.ItemDetailCommand.Command.Execute(new EventDetailParameters() { SelectedItem = newItem, MainWindow = (MainWindowViewModel)this.DataContext });
     }
   }
 }

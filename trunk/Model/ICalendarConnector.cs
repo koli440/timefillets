@@ -15,7 +15,9 @@ namespace TimeFillets.Model
     IEnumerable<CalendarItem> GetCalendarItems(Customer customer);
     IEnumerable<CalendarItem> GetCalendarItems(Task task);
 
-    void EditCalendarItem(CalendarItem item);
+    CalendarItem CreateCalendarItem(CalendarItem item);
+
+    CalendarItem EditCalendarItem(CalendarItem item);
 
     void OnPropertyChanged(string propertyName);
     event PropertyChangedEventHandler PropertyChanged;

@@ -14,6 +14,7 @@
         <StackPanel Grid.Row="0">
             <Menu>
                 <MenuItem Header="_File">
+                    <MenuItem Header="Create Event" Click="CreateEventMenuItem_Click"></MenuItem>
                     <MenuItem Command="{Binding Path=RefreshCalendarCommand.Command}" Header="{Binding Path=RefreshCalendarCommand.DisplayName}" IsEnabled="{Binding Path=RefreshCalendarCommand.Command.CanExecute}"></MenuItem>
                     <Separator></Separator>
                     <MenuItem Command="ApplicationCommands.Close" Header="_Close"></MenuItem>
