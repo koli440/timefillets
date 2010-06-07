@@ -44,7 +44,16 @@ namespace TimeFillets.Model
     {
       get
       {
-        return new Uri((string)applicationRootKey.GetValue(calendarUrlKey, string.Empty));
+        Uri url;
+        try
+        {
+          url = new Uri((string)applicationRootKey.GetValue(calendarUrlKey, string.Empty));
+        }
+        catch
+        {
+          url = new Uri("http://www.google.com/calendar/feeds/default/private/full");
+        }
+        return url;
       }
       set
       {
