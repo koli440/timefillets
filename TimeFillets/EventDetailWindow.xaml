@@ -66,7 +66,7 @@
                 <TextBox Grid.Column="1" Grid.Row="0" Name="CustomerTextBox" Text="{Binding Path=EventItem.CustomerItem.Name, Mode=TwoWay}"></TextBox>
                 <Label Grid.Column="0" Grid.Row="1">Project</Label>
                 <TextBox Grid.Column="1" Grid.Row="1" Name="ProjectTextBox" Text="{Binding Path=EventItem.ProjectItem.Name, Mode=TwoWay}"></TextBox>
-                <Label Grid.Column="0" Grid.Row="2">Location</Label>
+                <Label Grid.Column="0" Grid.Row="2">Task</Label>
                 <TextBox Grid.Column="1" Grid.Row="2" Name="TaskTextBox" Text="{Binding Path=EventItem.TaskItem.Name, Mode=TwoWay}"></TextBox>
             </Grid>
         </Expander>

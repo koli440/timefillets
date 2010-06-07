@@ -68,6 +68,10 @@ namespace TimeFillets.MainApplication
       settingsWindow.ShowDialog();
     }
 
+    /// <summary>
+    /// Logic for opening a event detail
+    /// </summary>
+    /// <param name="parameters">parameters with selected item and reference to main window</param>
     protected void OpenEventDetail(EventDetailParameters parameters)
     {
       if (parameters.SelectedItem != null)

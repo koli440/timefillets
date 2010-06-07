@@ -93,7 +93,9 @@ namespace TimeFillets.ViewModel
       this.EventItem = eventItem;
       this._mainWindow = mainWindow;
       if (string.IsNullOrWhiteSpace(eventItem.GoogleEventId))
+      {
         this.Mode = EntityMode.Create;
+      }
       else
         this.Mode = EntityMode.Update;
       this._calendarConnector = calendarConnector;
@@ -114,6 +116,9 @@ namespace TimeFillets.ViewModel
       {
         CalendarItem ret = null;
       
+        string definitionString = ProjectSettings.CreateNewDefinitionString(_eventItem.CustomerItem.Name, _eventItem.ProjectItem.Name, _eventItem.TaskItem.Name);
+        _eventItem.Description = string.Format("{0}\n{1}", _eventItem.CleanDescription, definitionString);
+
         if (this.Mode == EntityMode.Update)
           ret = _calendarConnector.EditCalendarItem(this.EventItem);
         if (this.Mode == EntityMode.Create)
