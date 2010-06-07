@@ -150,73 +150,10 @@ namespace TimeFillets.Connectors
 
         if (calendarFeed != null)
         {
-          ProjectDefinitionsConnector definitionsConnector = new ProjectDefinitionsConnector();
-          var definitions = definitionsConnector.GetDefinitions();
+
           foreach (EventEntry entry in calendarFeed.Entries)
           {
-            Customer customer = null;
-            Project project = null;
-            Task task = null;
-
-            // customer
-            Regex regex = ProjectSettings.CustomerRegex;
-            Match match = regex.Match(entry.Content.Content);
-            string name = string.Empty;
-            if (match.Success)
-              name = ProjectSettings.GetCustomerName(match.Value);
-            var retCustomer = definitions.Customers.Where(c => c.Name == name).FirstOrDefault();
-            if (retCustomer != null)
-              customer = retCustomer;
-            else
-              customer = new Customer() { Name = name };
-
-            // project
-            regex = ProjectSettings.ProjectRegex;
-            match = regex.Match(entry.Content.Content);
-            name = string.Empty;
-            if (match.Success)
-              name = ProjectSettings.GetProjectName(match.Value);
-            if (customer.Projects.Count > 0)
-            {
-              var retProject = customer.Projects.Where(p => p.Name == name).FirstOrDefault();
-              if (retProject != null)
-                project = retProject;
-              else
-                project = new Project() { Name = name };
-            }
-            else
-              project = new Project() { Name = name };
-
-            //task
-            regex = ProjectSettings.TaskRegex;
-            match = regex.Match(entry.Content.Content);
-            name = string.Empty;
-            if (match.Success)
-              name = ProjectSettings.GetTaskName(match.Value);
-            if (project.Tasks.Count > 0)
-            {
-              var retTask = project.Tasks.Where(item => item.Name == name).FirstOrDefault();
-              if (retTask != null)
-                task = retTask;
-              else
-                task = new Task() { Name = name };
-            }
-            else
-              task = new Task() { Name = name };
-
-            CalendarItem calendarItem = new CalendarItem(customer, project, task);
-            calendarItem.Title = entry.Title.Text;
-            calendarItem.Description = entry.Content.Content;
-            calendarItem.Updated = entry.Updated;
-            calendarItem.GoogleEventId = entry.EventId;
-            if (entry.Times.Count > 0)
-            {
-              calendarItem.StartDate = entry.Times.First().StartTime;
-              calendarItem.EndDate = entry.Times.First().EndTime;
-            }
-            calendarItem.IsRepeating = entry.Times.Count() == 0;
-            calendarItem.Location = entry.Locations.First().ValueString;
-
+            CalendarItem calendarItem = CreateCalendarItemFromEventEntry(entry);
             calendarItems.Add(calendarItem);
           }
         }
@@ -265,10 +202,41 @@ namespace TimeFillets.Connectors
     }
 
     /// <summary>
+    /// Creates new calendar item
+    /// </summary>
+    /// <param name="item">Item to be created</param>
+    public CalendarItem CreateCalendarItem(CalendarItem item)
+    {
+      EventEntry entry = new EventEntry();
+
+      entry.Title.Text = item.Title;
+      entry.Content.Content = item.Description;
+      entry.Updated = DateTime.Now;
+      if (entry.Times.Count > 0)
+      {
+        entry.Times.First().StartTime = item.StartDate;
+        entry.Times.First().EndTime = item.EndDate;
+      }
+      else
+      {
+        entry.Times.Add(new When(item.StartDate, item.EndDate, false));
+      }
+
+      if (entry.Locations.Count > 0)
+        entry.Locations.First().ValueString = item.Location;
+      else
+      {
+        entry.Locations.Add(new Where() { ValueString = item.Location });
+      }
+
+      return CreateCalendarItemFromEventEntry(service.Insert(CalendarUrl, entry));
+    }
+
+    /// <summary>
     /// Saves calendar item back to store
     /// </summary>
     /// <param name="item">item that should be saved</param>
-    public void EditCalendarItem(CalendarItem item)
+    public CalendarItem EditCalendarItem(CalendarItem item)
     {
       EventQuery query = new EventQuery();
       query.Uri = CalendarUrl;
@@ -278,7 +246,7 @@ namespace TimeFillets.Connectors
       if (feed != null)
       {
         EventEntry entry = feed.Entries.Where(itm => (itm as EventEntry).EventId == item.GoogleEventId).First() as EventEntry;
-        
+
         entry.Title.Text = item.Title;
         entry.Content.Content = item.Description;
         entry.Updated = DateTime.Now;
@@ -299,10 +267,10 @@ namespace TimeFillets.Connectors
           entry.Locations.Add(new Where() { ValueString = item.Location });
         }
 
-        
 
-        entry.Update();
+        return CreateCalendarItemFromEventEntry((EventEntry)entry.Update());
       }
+      return null;
     }
 
     private EventFeed GetEventFeed(EventQuery query)
@@ -318,6 +286,82 @@ namespace TimeFillets.Connectors
       myProxy.Credentials = credentials;
       myProxy.UseDefaultCredentials = true;
       requestFactory.Proxy = myProxy;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="CalendarItem"/> from provided <see cref="EventEntry"/>
+    /// </summary>
+    /// <param name="eventEntry">Event entry from calendar</param>
+    /// <returns>New instance of <see cref="CalendarItem"/> filled from <see cref="EventEntry"/>.</returns>
+    public CalendarItem CreateCalendarItemFromEventEntry(EventEntry eventEntry)
+    {
+      ProjectDefinitionsConnector definitionsConnector = new ProjectDefinitionsConnector();
+      var definitions = definitionsConnector.GetDefinitions();
+
+      Customer customer = null;
+      Project project = null;
+      Task task = null;
+
+      // customer
+      Regex regex = ProjectSettings.CustomerRegex;
+      Match match = regex.Match(eventEntry.Content.Content);
+      string name = string.Empty;
+      if (match.Success)
+        name = ProjectSettings.GetCustomerName(match.Value);
+      var retCustomer = definitions.Customers.Where(c => c.Name == name).FirstOrDefault();
+      if (retCustomer != null)
+        customer = retCustomer;
+      else
+        customer = new Customer() { Name = name };
+
+      // project
+      regex = ProjectSettings.ProjectRegex;
+      match = regex.Match(eventEntry.Content.Content);
+      name = string.Empty;
+      if (match.Success)
+        name = ProjectSettings.GetProjectName(match.Value);
+      if (customer.Projects.Count > 0)
+      {
+        var retProject = customer.Projects.Where(p => p.Name == name).FirstOrDefault();
+        if (retProject != null)
+          project = retProject;
+        else
+          project = new Project() { Name = name };
+      }
+      else
+        project = new Project() { Name = name };
+
+      //task
+      regex = ProjectSettings.TaskRegex;
+      match = regex.Match(eventEntry.Content.Content);
+      name = string.Empty;
+      if (match.Success)
+        name = ProjectSettings.GetTaskName(match.Value);
+      if (project.Tasks.Count > 0)
+      {
+        var retTask = project.Tasks.Where(item => item.Name == name).FirstOrDefault();
+        if (retTask != null)
+          task = retTask;
+        else
+          task = new Task() { Name = name };
+      }
+      else
+        task = new Task() { Name = name };
+
+      CalendarItem calendarItem = new CalendarItem(customer, project, task);
+      calendarItem.Title = eventEntry.Title.Text;
+      calendarItem.Description = eventEntry.Content.Content;
+      calendarItem.Updated = eventEntry.Updated;
+      calendarItem.GoogleEventId = eventEntry.EventId;
+      if (eventEntry.Times.Count > 0)
+      {
+        calendarItem.StartDate = eventEntry.Times.First().StartTime;
+        calendarItem.EndDate = eventEntry.Times.First().EndTime;
+      }
+      calendarItem.IsRepeating = eventEntry.Times.Count() == 0;
+      calendarItem.Location = eventEntry.Locations.First().ValueString;
+
+      return calendarItem;
     }
   }
 }

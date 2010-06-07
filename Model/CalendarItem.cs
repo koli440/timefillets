@@ -97,5 +97,14 @@ namespace TimeFillets.Model
       TaskItem = task;
     }
 
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    public CalendarItem()
+    {
+      this.StartDate = DateTime.Now;
+      this.EndDate = DateTime.Now.AddHours(0.5);
+    }
+
   }
 }

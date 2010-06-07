@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandViewModel.cs" />
+    <Compile Include="EventDetailParameters.cs" />
     <Compile Include="EventDetailWindowViewModel.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="ProjectDefinitionsWindowViewModel.cs" />

@@ -110,6 +110,7 @@
     <Compile Include="CalendarItem.cs" />
     <Compile Include="ConfigurationConnector.cs" />
     <Compile Include="Customer.cs" />
+    <Compile Include="EntityMode.cs" />
     <Compile Include="ICalendarConnector.cs" />
     <Compile Include="IExportConnector.cs" />
     <Compile Include="Project.cs" />
