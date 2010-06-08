@@ -65,6 +65,12 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    public CommandViewModel ProgressCommand
+    {
+      get;
+      private set;
+    }
+
     /// <summary>
     /// Start time of Event
     /// </summary>
@@ -125,7 +131,7 @@ namespace TimeFillets.ViewModel
 
     #region constructor
 
-    public EventDetailWindowViewModel(CalendarItem eventItem, ICalendarConnector calendarConnector, IErrorHelper errorHelper, MainWindowViewModel mainWindow)
+    public EventDetailWindowViewModel(CalendarItem eventItem, ICalendarConnector calendarConnector, CommandViewModel progressCommand, IErrorHelper errorHelper, MainWindowViewModel mainWindow)
     {
       if (eventItem == null)
         throw new ArgumentNullException("eventItem", "eventItem cannot be null");
@@ -145,7 +151,9 @@ namespace TimeFillets.ViewModel
       else
         this.Mode = EntityMode.Update;
       this._calendarConnector = calendarConnector;
+      
       this._errorHelper = errorHelper;
+      this.ProgressCommand = progressCommand;
 
     }
 

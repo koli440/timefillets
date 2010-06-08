@@ -78,9 +78,10 @@ namespace TimeFillets.MainApplication
       if (parameters.SelectedItem != null)
       {
         MessageBoxErrorHelper errorHelper = new MessageBoxErrorHelper();
+        CommandViewModel progressCommand = new CommandViewModel("Show progress", new RelayCommand(param => this.ShowProgress((BackgroundWorker)param)));
         ICalendarConnector calendarConnector = new GoogleCalendarConnector(SettingsConnector.ApplicationSettings.UserName, SettingsConnector.ApplicationSettings.Password, SettingsConnector.ApplicationSettings.CalendarUrl, SettingsConnector.ApplicationSettings.ApplicationName);
 
-        EventDetailWindowViewModel viewModel = new EventDetailWindowViewModel(parameters.SelectedItem, calendarConnector, errorHelper, parameters.MainWindow);
+        EventDetailWindowViewModel viewModel = new EventDetailWindowViewModel(parameters.SelectedItem, calendarConnector, progressCommand, errorHelper, parameters.MainWindow);
         EventDetailWindow eventDetailWindow = new EventDetailWindow();
         eventDetailWindow.DataContext = viewModel;
         eventDetailWindow.ShowDialog();
@@ -89,9 +90,10 @@ namespace TimeFillets.MainApplication
 
     protected void ShowProgress(BackgroundWorker worker)
     {
-      ProgressWindowViewModel viewModel = new ProgressWindowViewModel(worker);
       ProgressWindow progressWindow = new ProgressWindow();
-      progressWindow.DataContext = viewModel;
+      CommandViewModel progressCloseCommand = new CommandViewModel("Close progress", new RelayCommand(param => progressWindow.Close()));
+      ProgressWindowViewModel progressViewModel = new ProgressWindowViewModel(worker, progressCloseCommand);
+      progressWindow.DataContext = progressViewModel;
       progressWindow.Show();
     }
   }

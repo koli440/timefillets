@@ -3,15 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Threading;
 
 namespace TimeFillets.ViewModel
 {
   public class ProgressWindowViewModel : ViewModelBase
   {
     private int _totalCount;
-    private int _currentCount;
-    private int _percentCount;
+    private int _currentCount = 100;
+    private int _percentCount = 0;
     private BackgroundWorker _worker;
+    private CommandViewModel _closeCommand;
+
+
+    public CommandViewModel CloseCommand
+    {
+      get { return _closeCommand; }
+      private set { _closeCommand = value; }
+    }
 
     /// <summary>
     /// Total items count
@@ -58,15 +67,26 @@ namespace TimeFillets.ViewModel
       }
     }
 
-    public ProgressWindowViewModel(BackgroundWorker worker)
+    public ProgressWindowViewModel(BackgroundWorker worker, CommandViewModel closeCommand)
     {
+      if (closeCommand == null)
+        throw new ArgumentNullException("closeCommand", "Close command cannot be null");
+      CloseCommand = closeCommand;
+
       _worker = worker;
       _worker.ProgressChanged += new ProgressChangedEventHandler(_worker_ProgressChanged);
+      _worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_worker_RunWorkerCompleted);
+      _worker.RunWorkerAsync();
+    }
+
+    void _worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+    {
+      CloseCommand.Command.Execute(new Object());
     }
 
     void _worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
     {
-      PercentCount = e.ProgressPercentage;
+      this.PercentCount = e.ProgressPercentage;
     }
   }
 }

@@ -28,9 +28,19 @@ namespace TimeFillets.Connectors
     private string _password;
     private Uri _calendarUrl;
     private bool _isConnected;
+    private BackgroundWorker _worker;
     #endregion
 
     #region properties
+    /// <summary>
+    /// Bacground worker for prgress reporting
+    /// </summary>
+    public BackgroundWorker Worker
+    {
+      get { return _worker; }
+      set { _worker = value; }
+    }
+
     /// <summary>
     /// Username for calendar access
     /// </summary>
@@ -135,6 +145,7 @@ namespace TimeFillets.Connectors
     /// <returns></returns>
     public IEnumerable<CalendarItem> GetCalendarItems(DateTime from, DateTime to)
     {
+      ReportWork(10);
       List<CalendarItem> calendarItems = new List<CalendarItem>();
 
       EventQuery query = new EventQuery();
@@ -147,6 +158,7 @@ namespace TimeFillets.Connectors
       {
         EventFeed calendarFeed = GetEventFeed(query);
         this.IsConnected = true;
+        ReportWork(80);
 
         if (calendarFeed != null)
         {
@@ -155,6 +167,7 @@ namespace TimeFillets.Connectors
           {
             CalendarItem calendarItem = CreateCalendarItemFromEventEntry(entry);
             calendarItems.Add(calendarItem);
+            ReportWork((int)Math.Round(((double)calendarFeed.Entries.IndexOf(entry) + 1) / (double)calendarFeed.Entries.Count * 20 + 80));
           }
         }
       }
@@ -207,6 +220,7 @@ namespace TimeFillets.Connectors
     /// <param name="item">Item to be created</param>
     public CalendarItem CreateCalendarItem(CalendarItem item)
     {
+      ReportWork(10);
       EventEntry entry = new EventEntry();
 
       entry.Title.Text = item.Title;
@@ -228,8 +242,10 @@ namespace TimeFillets.Connectors
       {
         entry.Locations.Add(new Where() { ValueString = item.Location });
       }
-
-      return CreateCalendarItemFromEventEntry(service.Insert(CalendarUrl, entry));
+      ReportWork(20);
+      var ret = CreateCalendarItemFromEventEntry(service.Insert(CalendarUrl, entry));
+      ReportWork(100);
+      return ret;
     }
 
     /// <summary>
@@ -238,6 +254,7 @@ namespace TimeFillets.Connectors
     /// <param name="item">item that should be saved</param>
     public CalendarItem EditCalendarItem(CalendarItem item)
     {
+      ReportWork(10);
       EventQuery query = new EventQuery();
       query.Uri = CalendarUrl;
       query.NumberToRetrieve = 1000;
@@ -246,7 +263,7 @@ namespace TimeFillets.Connectors
       if (feed != null)
       {
         EventEntry entry = feed.Entries.Where(itm => (itm as EventEntry).EventId == item.GoogleEventId).First() as EventEntry;
-
+        ReportWork(80);
         entry.Title.Text = item.Title;
         entry.Content.Content = item.Description;
         entry.Updated = DateTime.Now;
@@ -268,7 +285,9 @@ namespace TimeFillets.Connectors
         }
 
 
-        return CreateCalendarItemFromEventEntry((EventEntry)entry.Update());
+        var ret = CreateCalendarItemFromEventEntry((EventEntry)entry.Update());
+        ReportWork(100);
+        return ret;
       }
       return null;
     }
@@ -279,6 +298,7 @@ namespace TimeFillets.Connectors
     /// <param name="item">Item to be deleted</param>
     public bool DeleteCalendarItem(CalendarItem item)
     {
+      ReportWork(10);
       EventQuery query = new EventQuery();
       query.Uri = CalendarUrl;
       query.NumberToRetrieve = 1000;
@@ -289,6 +309,7 @@ namespace TimeFillets.Connectors
         EventEntry entry = feed.Entries.Where(itm => (itm as EventEntry).EventId == item.GoogleEventId).First() as EventEntry;
         if (entry != null)
           entry.Delete();
+        ReportWork(100);
         return true;
       }
       return false;
@@ -383,6 +404,12 @@ namespace TimeFillets.Connectors
       calendarItem.Location = eventEntry.Locations.First().ValueString;
 
       return calendarItem;
+    }
+
+    private void ReportWork(int percentCompleted)
+    {
+      if (_worker != null)
+        _worker.ReportProgress(percentCompleted);
     }
   }
 }
