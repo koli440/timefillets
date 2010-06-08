@@ -19,6 +19,8 @@ namespace TimeFillets.Model
 
     CalendarItem EditCalendarItem(CalendarItem item);
 
+    bool DeleteCalendarItem(CalendarItem item);
+
     void OnPropertyChanged(string propertyName);
     event PropertyChangedEventHandler PropertyChanged;
   }

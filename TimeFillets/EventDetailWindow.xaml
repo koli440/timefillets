@@ -95,6 +95,17 @@
                 </StackPanel>
             </Grid>
         </Expander>
-        <Button x:Name="SaveButton" Command="{Binding Path=SaveCommand.Command}" Content="{Binding Path=SaveCommand.DisplayName}"></Button>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="0" x:Name="SaveButton" Command="{Binding Path=SaveCommand.Command}" Content="{Binding Path=SaveCommand.DisplayName}"></Button>
+            <Button Grid.Row="0" Grid.Column="1" x:Name="DeleteButton" Command="{Binding Path=DeleteCommand.Command}" Content="{Binding Path=DeleteCommand.DisplayName}"></Button>
+        </Grid>
+        
     </StackPanel>
 </Window>

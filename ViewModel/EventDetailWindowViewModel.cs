@@ -13,11 +13,15 @@ namespace TimeFillets.ViewModel
 
     private CalendarItem _eventItem;
     private CommandViewModel _saveCommand;
+    private CommandViewModel _deleteCommand;
     private ICalendarConnector _calendarConnector;
     private IErrorHelper _errorHelper;
     private MainWindowViewModel _mainWindow;
 
     #region Properties
+    /// <summary>
+    /// Item to be displayed and modified
+    /// </summary>
     public CalendarItem EventItem
     {
       get { return _eventItem; }
@@ -31,6 +35,9 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    /// <summary>
+    /// Command for saving changes
+    /// </summary>
     public CommandViewModel SaveCommand
     {
       get
@@ -43,6 +50,24 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    /// <summary>
+    /// Command for deleting item
+    /// </summary>
+    public CommandViewModel DeleteCommand
+    {
+      get
+      {
+        if (_deleteCommand == null)
+        {
+          _deleteCommand = new CommandViewModel("Delete Event", new RelayCommand(param => this.Delete()));
+        }
+        return _deleteCommand;
+      }
+    }
+
+    /// <summary>
+    /// Start time of Event
+    /// </summary>
     public string StartTime
     {
       get
@@ -59,6 +84,9 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    /// <summary>
+    /// End time of Event
+    /// </summary>
     public string EndTime
     {
       get
@@ -75,6 +103,9 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    /// <summary>
+    /// Update time of Event
+    /// </summary>
     public string UpdatedTime
     {
       get
@@ -85,6 +116,9 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    /// <summary>
+    /// Mode of window - Update or Delete
+    /// </summary>
     public EntityMode Mode { get; private set; }
 
     #endregion
@@ -153,6 +187,30 @@ namespace TimeFillets.ViewModel
       {
         _errorHelper.ShowError(e);
       }
+    }
+
+    /// <summary>
+    /// Deletes this calendar item
+    /// </summary>
+    public void Delete()
+    {
+      try
+      {
+        if (_calendarConnector.DeleteCalendarItem(_eventItem))
+        {
+          _errorHelper.ShowError("Calendar item was deleted");
+          _mainWindow.RefreshCalendar();
+        }
+        else
+        {
+          _errorHelper.ShowError("Calandar item failed to delete");
+        }
+      }
+      catch (Exception e)
+      {
+        _errorHelper.ShowError(e);
+      }
+
     }
 
     #endregion
