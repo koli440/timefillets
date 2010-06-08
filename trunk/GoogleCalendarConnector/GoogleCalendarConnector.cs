@@ -273,6 +273,27 @@ namespace TimeFillets.Connectors
       return null;
     }
 
+    /// <summary>
+    /// Deletes specified <see cref="CalendarItem"/>
+    /// </summary>
+    /// <param name="item">Item to be deleted</param>
+    public bool DeleteCalendarItem(CalendarItem item)
+    {
+      EventQuery query = new EventQuery();
+      query.Uri = CalendarUrl;
+      query.NumberToRetrieve = 1000;
+
+      EventFeed feed = GetEventFeed(query);
+      if (feed != null && !string.IsNullOrWhiteSpace(item.GoogleEventId))
+      {
+        EventEntry entry = feed.Entries.Where(itm => (itm as EventEntry).EventId == item.GoogleEventId).First() as EventEntry;
+        if (entry != null)
+          entry.Delete();
+        return true;
+      }
+      return false;
+    }
+
     private EventFeed GetEventFeed(EventQuery query)
     {
       return service.Query(query) as EventFeed;
