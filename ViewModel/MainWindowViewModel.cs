@@ -99,7 +99,7 @@ namespace TimeFillets.ViewModel
       get
       {
         if (_refreshCalendarCommand == null)
-          _refreshCalendarCommand = new CommandViewModel("Refresh Calendar", new RelayCommand(param => this.RefreshCalendar()));
+          _refreshCalendarCommand = new CommandViewModel("Refresh Calendar", new RelayCommand(param => this.RefreshCalendarAsync()));
         return _refreshCalendarCommand;
       }
     }
@@ -278,6 +278,8 @@ namespace TimeFillets.ViewModel
       _worker = new BackgroundWorker();
       _worker.WorkerReportsProgress = true;
 
+      _calendarConnector.Worker = _worker;
+
       if (SettingsConnector.ApplicationSettings.IsConfigurationValid)
       {
         RefreshCalendarAsync();
@@ -320,9 +322,16 @@ namespace TimeFillets.ViewModel
 
     public void RefreshCalendarAsync()
     {
-      _worker.DoWork += (sender, args) => { args.Result = RefreshCalendar(); };
-      _worker.RunWorkerCompleted += (sender, args) =>
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) => {
+        args.Result = RefreshCalendar();
+      });
+      _worker.DoWork += doWork;
+
+      RunWorkerCompletedEventHandler workCompleted = null;
+       workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
       {
+        _worker.DoWork -= doWork;
+        _worker.RunWorkerCompleted -= workCompleted;
         CalendarItems.Clear();
         if (args.Result != null)
         {
@@ -331,9 +340,10 @@ namespace TimeFillets.ViewModel
             CalendarItems.Add(item);
           }
         }
-      };
+      });
+      _worker.RunWorkerCompleted += workCompleted;
 
-      _worker.RunWorkerAsync();
+      ProgressCommand.Command.Execute(_worker);
     }
 
     /// <summary>
@@ -341,19 +351,28 @@ namespace TimeFillets.ViewModel
     /// </summary>
     public void SearchAsync()
     {
-      _worker.DoWork += (sender, args) => { args.Result = Search(); };
-      _worker.RunWorkerCompleted += (sender, args) =>
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) =>
       {
-        CalendarItems.Clear();
-        if (args.Result != null)
-        {
-          foreach (var item in (IEnumerable<CalendarItem>)args.Result)
-          {
-            CalendarItems.Add(item);
-          }
-        }
-      };
-      _worker.RunWorkerAsync();
+        args.Result = Search(); 
+      });
+      _worker.DoWork += doWork;
+      RunWorkerCompletedEventHandler workCompleted = null;
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
+     {
+       _worker.DoWork -= doWork;
+       _worker.RunWorkerCompleted -= workCompleted;
+       CalendarItems.Clear();
+       if (args.Result != null)
+       {
+         foreach (var item in (IEnumerable<CalendarItem>)args.Result)
+         {
+           CalendarItems.Add(item);
+         }
+       }
+
+     });
+      _worker.RunWorkerCompleted += workCompleted;
+      ProgressCommand.Command.Execute(_worker);
     }
 
     /// <summary>
@@ -380,7 +399,7 @@ namespace TimeFillets.ViewModel
     public void ExportAsync()
     {
       _worker.DoWork += (sender, args) => { Export(); };
-      _worker.RunWorkerAsync();
+      ProgressCommand.Command.Execute(_worker);
     }
 
     /// <summary>
@@ -398,6 +417,7 @@ namespace TimeFillets.ViewModel
             return;
           }
           ExcelSheetConnector exportConnector = ExportConnectors.Where(itm => itm.ConnectorName == "ExcelExportConnector").FirstOrDefault() as ExcelSheetConnector;
+          exportConnector.Worker = _worker;
           if (exportConnector != null)
           {
             if (string.IsNullOrWhiteSpace(ExportPath))

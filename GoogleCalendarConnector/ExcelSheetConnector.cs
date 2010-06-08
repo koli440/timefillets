@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using TimeFillets.Model;
 using DocumentFormat.OpenXml;
 using System.Globalization;
+using System.ComponentModel;
 
 
 namespace TimeFillets.Connectors
@@ -34,7 +35,12 @@ namespace TimeFillets.Connectors
         return "ExcelExportConnector";
       }
     }
-    
+
+    /// <summary>
+    /// BackgroundWorker for progress reporting
+    /// </summary>
+    public BackgroundWorker Worker { get; set; }
+
     /// <summary>
     /// Constructor
     /// </summary>
@@ -57,6 +63,7 @@ namespace TimeFillets.Connectors
       {
         using (SpreadsheetDocument output = SpreadsheetDocument.Create(path, DocumentFormat.OpenXml.SpreadsheetDocumentType.Workbook, true))
         {
+          ReportWork(10);
           output.AddPart<WorkbookPart>(template.WorkbookPart);
           uint rowIndex = 2;
           foreach (var calendarItem in calendarItems)
@@ -69,6 +76,8 @@ namespace TimeFillets.Connectors
             InsertText(output, calendarItem.TaskItem.Name, rowIndex, "F");
             InsertText(output, calendarItem.CleanDescription, rowIndex, "G");
             InsertNumber(output, calendarItem.Duration.TotalHours, rowIndex, "H");
+
+            ReportWork((int)Math.Round(((double)rowIndex - 1) / (double)calendarItems.Count() * 90 + 10));
             rowIndex++;
           }
         }
@@ -77,7 +86,7 @@ namespace TimeFillets.Connectors
 
     #endregion
 
-    private static void InsertText(SpreadsheetDocument spreadSheet, string text, uint rowIndex, string colIndex)
+    private void InsertText(SpreadsheetDocument spreadSheet, string text, uint rowIndex, string colIndex)
     {
       SharedStringTablePart shareStringPart;
       if (spreadSheet.WorkbookPart.GetPartsOfType<SharedStringTablePart>().Count() > 0)
@@ -98,7 +107,7 @@ namespace TimeFillets.Connectors
       worksheetPart.Worksheet.Save();
     }
 
-    private static int InsertSharedStringItem(string text, SharedStringTablePart shareStringPart)
+    private int InsertSharedStringItem(string text, SharedStringTablePart shareStringPart)
     {
       if (shareStringPart.SharedStringTable == null)
       {
@@ -122,7 +131,7 @@ namespace TimeFillets.Connectors
       return i;
     }
 
-    private static Cell InsertCellInWorksheet(string columnName, uint rowIndex, WorksheetPart worksheetPart)
+    private Cell InsertCellInWorksheet(string columnName, uint rowIndex, WorksheetPart worksheetPart)
     {
       Worksheet worksheet = worksheetPart.Worksheet;
       SheetData sheetData = worksheet.GetFirstChild<SheetData>();
@@ -163,7 +172,7 @@ namespace TimeFillets.Connectors
       }
     }
 
-    private static WorksheetPart GetWorksheetPartByName(SpreadsheetDocument document, string sheetName)
+    private WorksheetPart GetWorksheetPartByName(SpreadsheetDocument document, string sheetName)
     {
       IEnumerable<Sheet> sheets = document.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>().Where(s => s.Name == sheetName);
       if (sheets.Count() == 0)
@@ -176,7 +185,7 @@ namespace TimeFillets.Connectors
       return worksheetPart;
     }
 
-    private static void InsertNumber(SpreadsheetDocument spreadSheet, double number, uint rowIndex, string colIndex)
+    private void InsertNumber(SpreadsheetDocument spreadSheet, double number, uint rowIndex, string colIndex)
     {
       WorksheetPart worksheetPart = GetWorksheetPartByName(spreadSheet, "Sheet1");
       Cell cell = InsertCellInWorksheet(colIndex, rowIndex, worksheetPart);
@@ -188,7 +197,7 @@ namespace TimeFillets.Connectors
       worksheetPart.Worksheet.Save();
     }
 
-    private static void InsertDate(SpreadsheetDocument spreadSheet, DateTime date, uint rowIndex, string colIndex)
+    private void InsertDate(SpreadsheetDocument spreadSheet, DateTime date, uint rowIndex, string colIndex)
     {
       WorksheetPart worksheetPart = GetWorksheetPartByName(spreadSheet, "Sheet1");
       Cell cell = InsertCellInWorksheet(colIndex, rowIndex, worksheetPart);
@@ -198,7 +207,7 @@ namespace TimeFillets.Connectors
       worksheetPart.Worksheet.Save();
     }
 
-    private static void InsertTime(SpreadsheetDocument spreadSheet, DateTime date, uint rowIndex, string colIndex)
+    private void InsertTime(SpreadsheetDocument spreadSheet, DateTime date, uint rowIndex, string colIndex)
     {
       WorksheetPart worksheetPart = GetWorksheetPartByName(spreadSheet, "Sheet1");
       Cell cell = InsertCellInWorksheet(colIndex, rowIndex, worksheetPart);
@@ -208,6 +217,10 @@ namespace TimeFillets.Connectors
       worksheetPart.Worksheet.Save();
     }
 
-    
+    private void ReportWork(int percentCompleted)
+    {
+      if (Worker != null)
+        Worker.ReportProgress(percentCompleted);
+    }
   }
 }
