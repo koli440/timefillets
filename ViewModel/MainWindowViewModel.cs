@@ -30,18 +30,20 @@ namespace TimeFillets.ViewModel
     private CommandViewModel _searchCommand;
     private CommandViewModel _itemDetailCommand;
     private CommandViewModel _exportCommand;
+    private CommandViewModel _progressCommand;
     private string _searchPhrase;
     private string _searchIn = "Title";
     private string _exportType = ".xlsx";
     private string _exportPath;
     #endregion
-                                                                                                
+
     #region private variables
     protected ICalendarConnector _calendarConnector;
-    #endregion                                                                                  
-                                                                                                
+    private BackgroundWorker _worker;
+    #endregion
+
     #region properties
-                                                                                                
+
     /// <summary>
     /// Collection with returned calendar items
     /// </summary>
@@ -116,11 +118,11 @@ namespace TimeFillets.ViewModel
     /// </summary>
     public CommandViewModel ExportCommand
     {
-      get 
+      get
       {
         if (_exportCommand == null)
-          _exportCommand = new CommandViewModel("Export", new RelayCommand(param => this.Export()));
-        return _exportCommand; 
+          _exportCommand = new CommandViewModel("Export", new RelayCommand(param => this.ExportAsync()));
+        return _exportCommand;
       }
     }
 
@@ -141,7 +143,7 @@ namespace TimeFillets.ViewModel
       get
       {
         if (_searchCommand == null)
-          _searchCommand = new CommandViewModel("Search", new RelayCommand(param => this.Search()));
+          _searchCommand = new CommandViewModel("Search", new RelayCommand(param => this.SearchAsync()));
         return _searchCommand;
       }
 
@@ -154,6 +156,15 @@ namespace TimeFillets.ViewModel
     {
       get { return _itemDetailCommand; }
       private set { _itemDetailCommand = value; }
+    }
+
+    /// <summary>
+    /// Command to dispaly operation progress
+    /// </summary>
+    public CommandViewModel ProgressCommand
+    {
+      get { return _progressCommand; }
+      private set { _progressCommand = value; }
     }
 
     /// <summary>
@@ -178,7 +189,7 @@ namespace TimeFillets.ViewModel
     public string SearchIn
     {
       get { return _searchIn; }
-      set 
+      set
       {
         if (_searchIn == value)
           return;
@@ -242,7 +253,7 @@ namespace TimeFillets.ViewModel
     /// <param name="settingsCommand">Command for opening a settings window</param>
     /// <param name="itemDetailCommand">Command for opening a event detail window</param>
     /// <param name="errorHelper">Helper for displaying errors and messages</param>
-    public MainWindowViewModel(ICalendarConnector calendarConnector, CommandViewModel projectDefinitionsCommand, CommandViewModel settingsCommand, CommandViewModel itemDetailCommand, IErrorHelper errorHelper)
+    public MainWindowViewModel(ICalendarConnector calendarConnector, CommandViewModel projectDefinitionsCommand, CommandViewModel settingsCommand, CommandViewModel itemDetailCommand, CommandViewModel progressCommand, IErrorHelper errorHelper)
     {
       if (calendarConnector == null)
         throw new ArgumentException("Calendar connector cannot be null", "calendarConnector");
@@ -254,24 +265,29 @@ namespace TimeFillets.ViewModel
         throw new ArgumentException("Error helper cannot be null", "errorHelper");
       if (itemDetailCommand == null)
         throw new ArgumentException("Item detail command cannot be null", "itemDetailCommand");
+      if (progressCommand == null)
+        throw new ArgumentException("Progress command cannot be null", "progressCommand");
 
       _calendarConnector = calendarConnector;
       ProjectDefinitionsCommand = projectDefinitionsCommand;
       SettingsCommand = settingsCommand;
       ItemDetailCommand = itemDetailCommand;
+      ProgressCommand = progressCommand;
       ErrorHelper = errorHelper;
+
+      _worker = new BackgroundWorker();
+      _worker.WorkerReportsProgress = true;
 
       if (SettingsConnector.ApplicationSettings.IsConfigurationValid)
       {
-        RefreshCalendar();
+        RefreshCalendarAsync();
       }
-
     }
 
     #endregion
 
     #region events
-    protected void CalendarItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    public void CalendarItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
 
     }
@@ -281,24 +297,17 @@ namespace TimeFillets.ViewModel
     /// <summary>
     /// Refreshes calendar items with selected time range
     /// </summary>
-    public void RefreshCalendar()
+    public IEnumerable<CalendarItem> RefreshCalendar()
     {
+      IEnumerable<CalendarItem> ret = null;
       try
       {
         if (_calendarConnector != null)
         {
-          IEnumerable<CalendarItem> ret = null;
-
           if (From != null && From != null)
             ret = _calendarConnector.GetCalendarItems((DateTime)From, (DateTime)To);
           else
             ret = _calendarConnector.GetCalendarItems();
-
-          CalendarItems.Clear();
-          foreach (var item in ret)
-          {
-            CalendarItems.Add(item);
-          }
         }
       }
       catch (Exception e)
@@ -306,31 +315,72 @@ namespace TimeFillets.ViewModel
         Trace.WriteLine(e.Message);
         ErrorHelper.ShowError(e);
       }
+      return ret;
+    }
+
+    public void RefreshCalendarAsync()
+    {
+      _worker.DoWork += (sender, args) => { args.Result = RefreshCalendar(); };
+      _worker.RunWorkerCompleted += (sender, args) =>
+      {
+        CalendarItems.Clear();
+        if (args.Result != null)
+        {
+          foreach (var item in (IEnumerable<CalendarItem>)args.Result)
+          {
+            CalendarItems.Add(item);
+          }
+        }
+      };
+
+      _worker.RunWorkerAsync();
+    }
+
+    /// <summary>
+    /// Searches calandar with SearchPhrase and SearchIn properties asynchronously
+    /// </summary>
+    public void SearchAsync()
+    {
+      _worker.DoWork += (sender, args) => { args.Result = Search(); };
+      _worker.RunWorkerCompleted += (sender, args) =>
+      {
+        CalendarItems.Clear();
+        if (args.Result != null)
+        {
+          foreach (var item in (IEnumerable<CalendarItem>)args.Result)
+          {
+            CalendarItems.Add(item);
+          }
+        }
+      };
+      _worker.RunWorkerAsync();
     }
 
     /// <summary>
     /// Searches calandar with SearchPhrase and SearchIn properties
     /// </summary>
-    public void Search()
+    public IEnumerable<CalendarItem> Search()
     {
       if (string.IsNullOrEmpty(SearchPhrase))
       {
-        RefreshCalendar();
-        return;
+        return RefreshCalendar();
       }
 
       var ret = Searcher.Search(SearchIn, SearchPhrase, _calendarConnector.GetCalendarItems());
-      CalendarItems.Clear();
-      foreach (var item in ret)
-      {
-        if (this.From == null && this.To == null)
-        {
-          CalendarItems.Add(item);
-          continue;
-        }
-        if (item.StartDate >= this.From && item.EndDate <= this.To)
-          CalendarItems.Add(item);
-      }
+
+      if (this.From == null && this.To == null)
+        return ret;
+
+      return ret.Where(item => item.StartDate >= this.From && item.EndDate <= this.To);
+    }
+
+    /// <summary>
+    /// Exports data from list to file asynchronously
+    /// </summary>
+    public void ExportAsync()
+    {
+      _worker.DoWork += (sender, args) => { Export(); };
+      _worker.RunWorkerAsync();
     }
 
     /// <summary>
