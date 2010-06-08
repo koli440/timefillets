@@ -29,11 +29,12 @@ namespace TimeFillets.MainApplication
       CommandViewModel projectDefinitionsCommand = new CommandViewModel("Open project definitions", new RelayCommand(param => this.OpenProjectDefinitionsWindow()));
       CommandViewModel settingsCommand = new CommandViewModel("Open application settings", new RelayCommand(param => this.OpenSettingsWindow()));
       CommandViewModel itemDetailCommand = new CommandViewModel("Show item detail", new RelayCommand(param => this.OpenEventDetail((EventDetailParameters)param)));
+      CommandViewModel progressCommand = new CommandViewModel("Show progress", new RelayCommand(param => this.ShowProgress((BackgroundWorker)param)));
       MessageBoxErrorHelper errorHelper = new MessageBoxErrorHelper();
       
       ICalendarConnector calendarConnector = new GoogleCalendarConnector(SettingsConnector.ApplicationSettings.UserName, SettingsConnector.ApplicationSettings.Password, SettingsConnector.ApplicationSettings.CalendarUrl, SettingsConnector.ApplicationSettings.ApplicationName);
 
-      var viewModel = new MainWindowViewModel(calendarConnector, projectDefinitionsCommand, settingsCommand, itemDetailCommand, errorHelper);
+      var viewModel = new MainWindowViewModel(calendarConnector, projectDefinitionsCommand, settingsCommand, itemDetailCommand, progressCommand, errorHelper);
 
       string excelTemplatePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + ConfigurationManager.AppSettings["ExcelTemplatePath"];
       IExportConnector excelExportConnector = new ExcelSheetConnector(excelTemplatePath);
@@ -84,6 +85,14 @@ namespace TimeFillets.MainApplication
         eventDetailWindow.DataContext = viewModel;
         eventDetailWindow.ShowDialog();
       }
+    }
+
+    protected void ShowProgress(BackgroundWorker worker)
+    {
+      ProgressWindowViewModel viewModel = new ProgressWindowViewModel(worker);
+      ProgressWindow progressWindow = new ProgressWindow();
+      progressWindow.DataContext = viewModel;
+      progressWindow.Show();
     }
   }
 }
