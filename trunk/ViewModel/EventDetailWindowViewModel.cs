@@ -51,6 +51,12 @@ namespace TimeFillets.ViewModel
           return EventItem.StartDate.ToString(timeFormatString);
         return string.Empty;
       }
+      set
+      {
+        string dateTimeToParse = string.Format("{0} {1}", EventItem.StartDate.ToString("dd.MM.yyyy"), value);
+        EventItem.StartDate = DateTime.Parse(dateTimeToParse);
+        OnPropertyChanged("EventItem");
+      }
     }
 
     public string EndTime
@@ -60,6 +66,12 @@ namespace TimeFillets.ViewModel
         if (EventItem.EndDate != null && EventItem.EndDate > DateTime.MinValue)
           return EventItem.EndDate.ToString(timeFormatString);
         return string.Empty;
+      }
+      set
+      {
+        string dateTimeToParse = string.Format("{0} {1}", EventItem.EndDate.ToString("dd.MM.yyyy"), value);
+        EventItem.EndDate = DateTime.Parse(dateTimeToParse);
+        OnPropertyChanged("EventItem");
       }
     }
 

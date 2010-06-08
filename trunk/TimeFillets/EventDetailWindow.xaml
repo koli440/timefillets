@@ -36,13 +36,13 @@
                 </Grid.RowDefinitions>
                 <Label Grid.Column="0" Grid.Row="0">Start At</Label>
                 <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
-                    <DatePicker  Name="StartAtDatePicker" SelectedDate="{Binding Path=EventItem.StartDate, Mode=OneWay}"></DatePicker>
-                    <TextBox Name="StartAtTimeTextBox" Text="{Binding Path=StartTime, Mode=OneWay}" ></TextBox>
+                    <DatePicker  Name="StartAtDatePicker" SelectedDate="{Binding Path=EventItem.StartDate, Mode=TwoWay}"></DatePicker>
+                    <TextBox Name="StartAtTimeTextBox" Text="{Binding Path=StartTime, Mode=TwoWay}" ></TextBox>
                 </StackPanel>
                 <Label Grid.Column="0" Grid.Row="1">End At</Label>
                 <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
-                    <DatePicker Name="EndAtDatePicker" SelectedDate="{Binding Path=EventItem.EndDate, Mode=OneWay}"></DatePicker>
-                    <TextBox Name="EndAtTimeTextBox" Text="{Binding Path=EndTime, Mode=OneWay}" ></TextBox>
+                    <DatePicker Name="EndAtDatePicker" SelectedDate="{Binding Path=EventItem.EndDate, Mode=TwoWay}"></DatePicker>
+                    <TextBox Name="EndAtTimeTextBox" Text="{Binding Path=EndTime, Mode=TwoWay}" ></TextBox>
                 </StackPanel>
                 <Label Grid.Column="0" Grid.Row="2">Duration</Label>
                 <TextBox Grid.Column="1" Grid.Row="2" Name="DurationTextBox" Text="{Binding Path=EventItem.Duration, Mode=OneWay}"></TextBox>
@@ -90,8 +90,8 @@
                 </ComboBox>
                 <Label Grid.Column="0" Grid.Row="1">Updated</Label>
                 <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
-                    <DatePicker Name="UpdatedDatePicker" SelectedDate="{Binding Path=EventItem.Updated, Mode=OneWay}"></DatePicker>
-                    <TextBox Name="UpdatedTimeTextBox" Text="{Binding Path=UpdatedTime, Mode=OneWay}" ></TextBox>
+                    <DatePicker Name="UpdatedDatePicker" SelectedDate="{Binding Path=EventItem.Updated, Mode=OneWay}" IsEnabled="False"></DatePicker>
+                    <TextBox Name="UpdatedTimeTextBox" Text="{Binding Path=UpdatedTime, Mode=OneWay}" IsEnabled="False" ></TextBox>
                 </StackPanel>
             </Grid>
         </Expander>
