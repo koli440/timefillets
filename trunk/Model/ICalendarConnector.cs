@@ -23,7 +23,5 @@ namespace TimeFillets.Model
 
     void OnPropertyChanged(string propertyName);
     event PropertyChangedEventHandler PropertyChanged;
-
-    BackgroundWorker Worker { get; set; }
   }
 }

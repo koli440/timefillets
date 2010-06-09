@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using TimeFillets.Model;
 using TimeFillets.Helpers;
+using System.ComponentModel;
 
 namespace TimeFillets.ViewModel
 {
@@ -17,6 +18,7 @@ namespace TimeFillets.ViewModel
     private ICalendarConnector _calendarConnector;
     private IErrorHelper _errorHelper;
     private MainWindowViewModel _mainWindow;
+    private BackgroundWorker _worker;
 
     #region Properties
     /// <summary>
@@ -44,7 +46,7 @@ namespace TimeFillets.ViewModel
       {
         if (_saveCommand == null)
         {
-          _saveCommand = new CommandViewModel("Save Event", new RelayCommand(param => this.Save()));
+          _saveCommand = new CommandViewModel("Save Event", new RelayCommand(param => this.SaveAsync()));
         }
         return _saveCommand;
       }
@@ -59,7 +61,7 @@ namespace TimeFillets.ViewModel
       {
         if (_deleteCommand == null)
         {
-          _deleteCommand = new CommandViewModel("Delete Event", new RelayCommand(param => this.Delete()));
+          _deleteCommand = new CommandViewModel("Delete Event", new RelayCommand(param => this.DeleteAsync()));
         }
         return _deleteCommand;
       }
@@ -155,11 +157,32 @@ namespace TimeFillets.ViewModel
       this._errorHelper = errorHelper;
       this.ProgressCommand = progressCommand;
 
+      _worker = new BackgroundWorker();
+      _worker.WorkerReportsProgress = true;
+      ((IAsynchronousConnector)_calendarConnector).Worker = _worker;
     }
 
     #endregion
 
     #region methods
+
+    /// <summary>
+    /// Saves (create or update) this item asynchronously
+    /// </summary>
+    public void SaveAsync()
+    {
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) => { Save(); });
+      _worker.DoWork += doWork;
+      RunWorkerCompletedEventHandler workCompleted = null;
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
+      {
+        _worker.DoWork -= doWork;
+        _worker.RunWorkerCompleted -= workCompleted;
+      });
+      _worker.RunWorkerCompleted += workCompleted;
+
+      ProgressCommand.Command.Execute(_worker);
+    }
 
     /// <summary>
     /// Saves (create or update) current instance of <see cref="TimeFillets.Model.CalendarItem"/> into store using connector.
@@ -180,11 +203,6 @@ namespace TimeFillets.ViewModel
 
         if (ret != null)
         {
-          var oldEvent = _mainWindow.CalendarItems.Where(itm => itm.GoogleEventId == ret.GoogleEventId).FirstOrDefault();
-          if (oldEvent == null)
-          {
-            _mainWindow.RefreshCalendar();
-          }
           _errorHelper.ShowError("Calendar item successfully saved");
         }
         else
@@ -198,6 +216,24 @@ namespace TimeFillets.ViewModel
     }
 
     /// <summary>
+    /// Deletes this calendar item asynchronously
+    /// </summary>
+    public void DeleteAsync()
+    {
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) => { Delete(); });
+      _worker.DoWork += doWork;
+      RunWorkerCompletedEventHandler workCompleted = null;
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
+      {
+        _worker.DoWork -= doWork;
+        _worker.RunWorkerCompleted -= workCompleted;
+      });
+      _worker.RunWorkerCompleted += workCompleted;
+
+      ProgressCommand.Command.Execute(_worker);
+    }
+
+    /// <summary>
     /// Deletes this calendar item
     /// </summary>
     public void Delete()
@@ -207,7 +243,6 @@ namespace TimeFillets.ViewModel
         if (_calendarConnector.DeleteCalendarItem(_eventItem))
         {
           _errorHelper.ShowError("Calendar item was deleted");
-          _mainWindow.RefreshCalendar();
         }
         else
         {

@@ -18,7 +18,7 @@ namespace TimeFillets.Connectors
   /// <summary>
   /// Class for export to excel sheet
   /// </summary>
-  public class ExcelSheetConnector : IExportConnector
+  public class ExcelSheetConnector : IExportConnector, IAsynchronousConnector
   {
     /// <summary>
     /// Path to excel sheet template
@@ -217,7 +217,7 @@ namespace TimeFillets.Connectors
       worksheetPart.Worksheet.Save();
     }
 
-    private void ReportWork(int percentCompleted)
+    public void ReportWork(int percentCompleted)
     {
       if (Worker != null)
         Worker.ReportProgress(percentCompleted);

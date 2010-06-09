@@ -51,8 +51,9 @@ namespace TimeFillets.MainApplication
     /// </summary>
     protected void OpenProjectDefinitionsWindow()
     {
+      CommandViewModel progressCommand = new CommandViewModel("Show progress", new RelayCommand(param => this.ShowProgress((BackgroundWorker)param)));
       MessageBoxErrorHelper errorHelper = new MessageBoxErrorHelper();
-      ProjectDefinitionsWindowViewModel viewModel = new ProjectDefinitionsWindowViewModel(errorHelper);
+      ProjectDefinitionsWindowViewModel viewModel = new ProjectDefinitionsWindowViewModel(errorHelper, progressCommand);
       ProjectsDefinitionsWindow projectDefinitionsWindow = new ProjectsDefinitionsWindow();
       projectDefinitionsWindow.DataContext = viewModel;
       projectDefinitionsWindow.ShowDialog();

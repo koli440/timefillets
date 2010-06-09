@@ -17,7 +17,7 @@ namespace TimeFillets.Connectors
   /// <summary>
   /// Provides functionality to operate with Google calendar
   /// </summary>
-  public class GoogleCalendarConnector : ConnectorBase, ICalendarConnector
+  public class GoogleCalendarConnector : ConnectorBase, ICalendarConnector, IAsynchronousConnector
   {
 
     private CalendarService service;
@@ -406,7 +406,7 @@ namespace TimeFillets.Connectors
       return calendarItem;
     }
 
-    private void ReportWork(int percentCompleted)
+    public void ReportWork(int percentCompleted)
     {
       if (_worker != null)
         _worker.ReportProgress(percentCompleted);

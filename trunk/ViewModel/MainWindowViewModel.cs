@@ -278,7 +278,7 @@ namespace TimeFillets.ViewModel
       _worker = new BackgroundWorker();
       _worker.WorkerReportsProgress = true;
 
-      _calendarConnector.Worker = _worker;
+      ((IAsynchronousConnector)_calendarConnector).Worker = _worker;
 
       if (SettingsConnector.ApplicationSettings.IsConfigurationValid)
       {
@@ -398,7 +398,16 @@ namespace TimeFillets.ViewModel
     /// </summary>
     public void ExportAsync()
     {
-      _worker.DoWork += (sender, args) => { Export(); };
+      DoWorkEventHandler doWork = new DoWorkEventHandler( (sender, args) => { Export(); });
+      _worker.DoWork += doWork;
+      RunWorkerCompletedEventHandler workCompleted = null;
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) => 
+        {
+          _worker.DoWork -= doWork;
+          _worker.RunWorkerCompleted -= workCompleted;
+        });
+      _worker.RunWorkerCompleted += workCompleted;
+      
       ProgressCommand.Command.Execute(_worker);
     }
 

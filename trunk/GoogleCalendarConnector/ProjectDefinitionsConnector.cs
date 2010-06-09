@@ -15,7 +15,7 @@ namespace TimeFillets.Connectors
   /// <summary>
   /// Provides functionality for project definitions
   /// </summary>
-  public class ProjectDefinitionsConnector
+  public class ProjectDefinitionsConnector : IAsynchronousConnector
   {
     private List<Customer> scannedItems;
     private readonly string projectDefinitionsFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + ConfigurationManager.AppSettings["ProjectDefinitionPath"];
@@ -47,24 +47,29 @@ namespace TimeFillets.Connectors
     {
       try
       {
+        ReportWork(10);
         if (!SettingsConnector.ApplicationSettings.IsConfigurationValid)
           throw new Exception("Application setting is not valid");
         GoogleCalendarConnector connector = new GoogleCalendarConnector(SettingsConnector.ApplicationSettings.UserName, SettingsConnector.ApplicationSettings.Password, SettingsConnector.ApplicationSettings.CalendarUrl, SettingsConnector.ApplicationSettings.ApplicationName);
 
         IEnumerable<CalendarItem> calendarItems = connector.GetCalendarItems(from, to);
-
+        ReportWork(50);
         XDocument doc = new XDocument();
 
+        int i = 1;
         foreach (CalendarItem item in calendarItems)
         {
           ensureCustomer(item.CustomerItem);
           ensureProject(item.ProjectItem, item.CustomerItem);
           ensureTask(item.TaskItem, item.ProjectItem, item.CustomerItem);
+          ReportWork((int)Math.Round(((double)i) / (double)calendarItems.Count() * 25 + 50));
+          i++;
         }
 
         XElement rootElement = new XElement("projectsDefinitions");
         doc.Add(rootElement);
 
+        i = 1;
         foreach (Customer customer in scannedItems)
         {
           XElement customerElement = new XElement("customer", new XAttribute("name", customer.Name));
@@ -79,6 +84,8 @@ namespace TimeFillets.Connectors
               projectElement.Add(taskElement);
             }
           }
+          ReportWork((int)Math.Round(((double)i) / (double)scannedItems.Count() * 25 + 75));
+          i++;
         }
 
         return doc;
@@ -261,5 +268,21 @@ namespace TimeFillets.Connectors
       return customers;
     }
 
+
+    #region IAsynchronousConnector Members
+
+    public System.ComponentModel.BackgroundWorker Worker
+    {
+      get;
+      set;
+    }
+
+    public void ReportWork(int percentCompleted)
+    {
+      if (Worker != null)
+        Worker.ReportProgress(percentCompleted);
+    }
+
+    #endregion
   }
 }
