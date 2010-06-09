@@ -7,6 +7,7 @@ using TimeFillets.Model;
 using TimeFillets.Connectors;
 using TimeFillets.Helpers;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace TimeFillets.ViewModel
 {
@@ -17,6 +18,8 @@ namespace TimeFillets.ViewModel
   {
     #region fields
     private XDocument _scannedDefinitions;
+    private CommandViewModel _progressCommand;
+    private BackgroundWorker _worker;
     #endregion
 
     #region properties
@@ -36,6 +39,22 @@ namespace TimeFillets.ViewModel
         base.OnPropertyChanged("ScannedDefinitionsFormated");
       }
     }
+
+    /// <summary>
+    /// Command for displaying progress
+    /// </summary>
+    public CommandViewModel ProgressCommand
+    {
+      get
+      {
+        return _progressCommand;
+      }
+      set
+      {
+        _progressCommand = value;
+      }
+    }
+
 
     /// <summary>
     /// Formated definitions for databinding
@@ -75,12 +94,19 @@ namespace TimeFillets.ViewModel
     /// <summary>
     /// Default constructor
     /// </summary>
-    public ProjectDefinitionsWindowViewModel(IErrorHelper errorHelper)
+    public ProjectDefinitionsWindowViewModel(IErrorHelper errorHelper, CommandViewModel progressCommand)
     {
-      ScanCommand = new CommandViewModel("Scan definitions", new RelayCommand(param => this.ScanDefinitions()));
+      ScanCommand = new CommandViewModel("Scan definitions", new RelayCommand(param => this.ScanDefinitionsAsync()));
       SaveCommand = new CommandViewModel("Save definitions", new RelayCommand(param => this.SaveDefinitions()));
       ErrorHelper = errorHelper;
       ProjectDefinitionsConnector connector = new ProjectDefinitionsConnector();
+      
+       _progressCommand = progressCommand;
+      _worker = new BackgroundWorker();
+      _worker.WorkerReportsProgress = true;
+
+      connector.Worker = _worker;
+
       ScannedDefinitions = connector.OpenDefinitions();
     }
     #endregion
@@ -105,6 +131,24 @@ namespace TimeFillets.ViewModel
     }
 
     /// <summary>
+    /// Scans for definitions asynchronously
+    /// </summary>
+    protected void ScanDefinitionsAsync()
+    {
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) => { ScanDefinitions(); });
+      _worker.DoWork += doWork;
+      RunWorkerCompletedEventHandler workCompleted = null;
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
+      {
+        _worker.DoWork -= doWork;
+        _worker.RunWorkerCompleted -= workCompleted;
+      });
+      _worker.RunWorkerCompleted += workCompleted;
+
+      ProgressCommand.Command.Execute(_worker);
+    }
+
+    /// <summary>
     /// Scans for definitions
     /// </summary>
     protected void ScanDefinitions()
@@ -112,6 +156,7 @@ namespace TimeFillets.ViewModel
       try
       {
         ProjectDefinitionsConnector connector = new ProjectDefinitionsConnector();
+        connector.Worker = _worker;
         this.ScannedDefinitions = connector.ScanForDefinitions();
       }
       catch (Exception e)
