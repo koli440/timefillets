@@ -35,6 +35,7 @@ namespace TimeFillets.ViewModel
     private string _searchIn = "Title";
     private string _exportType = ".xlsx";
     private string _exportPath;
+    private EventsSummary _summary;
     #endregion
 
     #region private variables
@@ -241,6 +242,22 @@ namespace TimeFillets.ViewModel
       }
     }
 
+    /// <summary>
+    /// Provides summary of filtered events
+    /// </summary>
+    public EventsSummary Summary
+    {
+      get { return _summary; }
+      private set
+      {
+        if (_summary == value)
+          return;
+
+        _summary = value;
+        base.OnPropertyChanged("Summary");
+      }
+    }
+
     #endregion
 
     #region constructor
@@ -322,25 +339,27 @@ namespace TimeFillets.ViewModel
 
     public void RefreshCalendarAsync()
     {
-      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) => {
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) =>
+      {
         args.Result = RefreshCalendar();
       });
       _worker.DoWork += doWork;
 
       RunWorkerCompletedEventHandler workCompleted = null;
-       workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
-      {
-        _worker.DoWork -= doWork;
-        _worker.RunWorkerCompleted -= workCompleted;
-        CalendarItems.Clear();
-        if (args.Result != null)
-        {
-          foreach (var item in (IEnumerable<CalendarItem>)args.Result)
-          {
-            CalendarItems.Add(item);
-          }
-        }
-      });
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
+     {
+       _worker.DoWork -= doWork;
+       _worker.RunWorkerCompleted -= workCompleted;
+       CalendarItems.Clear();
+       if (args.Result != null)
+       {
+         foreach (var item in (IEnumerable<CalendarItem>)args.Result)
+         {
+           CalendarItems.Add(item);
+         }
+       }
+       RefreshSummary();
+     });
       _worker.RunWorkerCompleted += workCompleted;
 
       ProgressCommand.Command.Execute(_worker);
@@ -353,7 +372,7 @@ namespace TimeFillets.ViewModel
     {
       DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) =>
       {
-        args.Result = Search(); 
+        args.Result = Search();
       });
       _worker.DoWork += doWork;
       RunWorkerCompletedEventHandler workCompleted = null;
@@ -369,7 +388,7 @@ namespace TimeFillets.ViewModel
            CalendarItems.Add(item);
          }
        }
-
+       RefreshSummary();
      });
       _worker.RunWorkerCompleted += workCompleted;
       ProgressCommand.Command.Execute(_worker);
@@ -398,16 +417,16 @@ namespace TimeFillets.ViewModel
     /// </summary>
     public void ExportAsync()
     {
-      DoWorkEventHandler doWork = new DoWorkEventHandler( (sender, args) => { Export(); });
+      DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) => { Export(); });
       _worker.DoWork += doWork;
       RunWorkerCompletedEventHandler workCompleted = null;
-      workCompleted = new RunWorkerCompletedEventHandler((sender, args) => 
+      workCompleted = new RunWorkerCompletedEventHandler((sender, args) =>
         {
           _worker.DoWork -= doWork;
           _worker.RunWorkerCompleted -= workCompleted;
         });
       _worker.RunWorkerCompleted += workCompleted;
-      
+
       ProgressCommand.Command.Execute(_worker);
     }
 
@@ -452,6 +471,26 @@ namespace TimeFillets.ViewModel
       {
         ErrorHelper.ShowError(e);
       }
+    }
+
+    /// <summary>
+    /// Refreshes a summary property
+    /// </summary>
+    private void RefreshSummary()
+    {
+      EventsSummary summary = new EventsSummary();
+
+      foreach (var item in CalendarItems)
+      {
+        summary.DurationSummary = summary.DurationSummary.Add(item.Duration);
+      }
+      
+      summary.EventsCount = CalendarItems.Count;
+      summary.ProjectsCount = CalendarItems.GroupBy(itm => itm.ProjectItem.Name.ToLowerInvariant()).Count();
+      summary.CustomersCount = CalendarItems.GroupBy(itm => itm.CustomerItem.Name.ToLowerInvariant()).Count();
+      summary.TasksCount = CalendarItems.GroupBy(itm => itm.TaskItem.Name.ToLowerInvariant()).Count();
+
+      Summary = summary;
     }
     #endregion
   }

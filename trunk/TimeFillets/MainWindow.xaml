@@ -10,6 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <Menu>
@@ -82,5 +83,43 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <Expander Grid.Row="2" IsExpanded="True">
+            <Expander.Header>Summary</Expander.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                    <Label>Duration (hours):</Label>
+                    <Label Content="{Binding Path=Summary.DurationSummaryHours}"></Label>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                    <Label>Duration (MD):</Label>
+                    <Label Content="{Binding Path=Summary.DurationSummaryManDays}"></Label>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                    <Label>Events count:</Label>
+                    <Label Content="{Binding Path=Summary.EventsCount}"></Label>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                    <Label>Customers count:</Label>
+                    <Label Content="{Binding Path=Summary.CustomersCount}"></Label>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                    <Label>Projects count:</Label>
+                    <Label Content="{Binding Path=Summary.ProjectsCount}"></Label>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                    <Label>Tasks count:</Label>
+                    <Label Content="{Binding Path=Summary.TasksCount}"></Label>
+                </StackPanel>
+            </Grid>
+        </Expander>
     </Grid>
 </Window>
