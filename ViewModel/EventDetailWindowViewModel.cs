@@ -112,6 +112,23 @@ namespace TimeFillets.ViewModel
     }
 
     /// <summary>
+    /// Duration wrapper property
+    /// </summary>
+    public TimeSpan DurationWrapper
+    {
+      get
+      {
+        return EventItem.Duration;
+      }
+      set
+      {
+        EventItem.Duration = value;
+        OnPropertyChanged("EventItem");
+        OnPropertyChanged("EndTime");
+      }
+    }
+
+    /// <summary>
     /// Update time of Event
     /// </summary>
     public string UpdatedTime
