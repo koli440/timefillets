@@ -92,7 +92,7 @@ namespace TimeFillets.Model
     /// <param name="customer">Events customer item</param>
     /// <param name="project">Events project item</param>
     /// <param name="task">Ecents task item</param>
-    public CalendarItem(Customer customer, Project project, Task task)
+    public CalendarItem(Customer customer, Project project, Task task) : this()
     {
       CustomerItem = customer;
       ProjectItem = project;
@@ -109,6 +109,7 @@ namespace TimeFillets.Model
       this.CustomerItem = new Customer();
       this.ProjectItem = new Project();
       this.TaskItem = new Task();
+      this.Description = string.Empty;
     }
 
   }
