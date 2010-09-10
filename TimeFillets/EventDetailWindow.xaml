@@ -18,7 +18,7 @@
                 <Label Grid.Column="0" Grid.Row="0">Title</Label>
                 <TextBox Grid.Column="1" Grid.Row="0" x:Name="NameTextBox" Text="{Binding Path=EventItem.Title, Mode=TwoWay}"></TextBox>
                 <Label Grid.Column="0" Grid.Row="1">Description</Label>
-                <TextBox Grid.Column="1" Grid.Row="1" x:Name="DescriptionTextBox" Text="{Binding Path=EventItem.Description, Mode=TwoWay}"></TextBox>
+                <TextBox Grid.Column="1" Grid.Row="1" x:Name="DescriptionTextBox" AcceptsReturn="True" Text="{Binding Path=EventItem.Description, Mode=TwoWay}"></TextBox>
             </Grid>
         </Expander>
         <Expander IsExpanded="True">
