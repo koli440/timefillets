@@ -73,6 +73,7 @@ namespace TimeFillets.Model
     public TimeSpan Duration
     {
       get { return this.EndDate - this.StartDate; }
+      set { this.EndDate = StartDate + value; }
     }
 
     /// <summary>
