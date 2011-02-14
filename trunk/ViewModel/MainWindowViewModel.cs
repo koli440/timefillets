@@ -31,6 +31,10 @@ namespace TimeFillets.ViewModel
     private CommandViewModel _itemDetailCommand;
     private CommandViewModel _exportCommand;
     private CommandViewModel _progressCommand;
+    private CommandViewModel _thisDayCommand;
+    private CommandViewModel _thisWeekCommand;
+    private CommandViewModel _thisMonthCommand;
+    private CommandViewModel _thisYearCommand;
     private string _searchPhrase;
     private string _searchIn = "Title";
     private string _exportType = ".xlsx";
@@ -102,6 +106,64 @@ namespace TimeFillets.ViewModel
         if (_refreshCalendarCommand == null)
           _refreshCalendarCommand = new CommandViewModel("Refresh Calendar", new RelayCommand(param => this.RefreshCalendarAsync()));
         return _refreshCalendarCommand;
+      }
+    }
+
+    /// <summary>
+    /// Command for selecting today
+    /// </summary>
+    public CommandViewModel ThisDayCommand
+    {
+      get
+      {
+        if (_thisDayCommand == null)
+          _thisDayCommand = new CommandViewModel("This day", new RelayCommand(param => this.ShowThisDayAsync()));
+        return _thisDayCommand;
+      }
+    }
+
+    /// <summary>
+    /// Command for selecting today
+    /// </summary>
+    public CommandViewModel ThisWeekCommand
+    {
+      get
+      {
+        if (_thisWeekCommand == null)
+          _thisWeekCommand = new CommandViewModel("This week", new RelayCommand(param => this.ShowThisWeekAsync()));
+        From = DateTime.Today;
+        To = DateTime.Today.AddDays(7);
+        return _thisWeekCommand;
+      }
+    }
+
+    /// <summary>
+    /// Command for selecting today
+    /// </summary>
+    public CommandViewModel ThisMonthCommand
+    {
+      get
+      {
+        if (_thisMonthCommand == null)
+          _thisMonthCommand = new CommandViewModel("This month", new RelayCommand(param => this.ShowThisMonthAsync()));
+        From = DateTime.Today;
+        To = DateTime.Today.AddDays(31);
+        return _thisMonthCommand;
+      }
+    }
+
+    /// <summary>
+    /// Command for selecting today
+    /// </summary>
+    public CommandViewModel ThisYearCommand
+    {
+      get
+      {
+        if (_thisYearCommand == null)
+          _thisYearCommand = new CommandViewModel("This Year", new RelayCommand(param => this.ShowThisYearAsync()));
+        From = DateTime.Today;
+        To = DateTime.Today.AddDays(364);
+        return _thisYearCommand;
       }
     }
 
@@ -337,6 +399,9 @@ namespace TimeFillets.ViewModel
       return ret;
     }
 
+    /// <summary>
+    /// Aynchronously refreshes calendar with selected time range
+    /// </summary>
     public void RefreshCalendarAsync()
     {
       DoWorkEventHandler doWork = new DoWorkEventHandler((sender, args) =>
@@ -363,6 +428,46 @@ namespace TimeFillets.ViewModel
       _worker.RunWorkerCompleted += workCompleted;
 
       ProgressCommand.Command.Execute(_worker);
+    }
+
+    /// <summary>
+    /// Sets today time span and refreshes calendar using async method
+    /// </summary>
+    public void ShowThisDayAsync()
+    {
+      From = DateTime.Today;
+      To = DateTime.Today.AddDays(1);
+      RefreshCalendarAsync();
+    }
+
+    /// <summary>
+    /// Sets this week time span and refreshes calendar using async method
+    /// </summary>
+    public void ShowThisWeekAsync()
+    {
+      From = DateTime.Today.AddDays(-((int)DateTime.Today.DayOfWeek - 1));
+      To = From.Value.AddDays(7);
+      RefreshCalendarAsync();
+    }
+
+    /// <summary>
+    /// Sets this month time span and refreshes calendar using async method
+    /// </summary>
+    public void ShowThisMonthAsync()
+    {
+      From = DateTime.Today.AddDays(-((int)DateTime.Today.Day) + 1);
+      To = From.Value.AddMonths(1);
+      RefreshCalendarAsync();
+    }
+
+    /// <summary>
+    /// Sets this year time span and refreshes calendar using async method
+    /// </summary>
+    public void ShowThisYearAsync()
+    {
+      From = DateTime.Today.AddDays(-((int)DateTime.Today.DayOfYear) + 1);
+      To = From.Value.AddYears(1);
+      RefreshCalendarAsync();
     }
 
     /// <summary>

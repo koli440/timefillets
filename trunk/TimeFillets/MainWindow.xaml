@@ -33,6 +33,10 @@
                     <Label>To:</Label>
                     <DatePicker Name="PeriodToDatePicker" SelectedDate="{Binding Path=To}"></DatePicker>
                     <Button Name="RefreshItemsButton" Command="{Binding Path=RefreshCalendarCommand.Command}" Content="{Binding Path=RefreshCalendarCommand.DisplayName}"></Button>
+                    <Button Name="ThisDayButton" Command="{Binding Path=ThisDayCommand.Command}" Content="{Binding Path=ThisDayCommand.DisplayName}"></Button>
+                    <Button Name="ThisWeekButton" Command="{Binding Path=ThisWeekCommand.Command}" Content="{Binding Path=ThisWeekCommand.DisplayName}"></Button>
+                    <Button Name="ThisMonthButton" Command="{Binding Path=ThisMonthCommand.Command}" Content="{Binding Path=ThisMonthCommand.DisplayName}"></Button>
+                    <Button Name="ThisYearButton" Command="{Binding Path=ThisYearCommand.Command}" Content="{Binding Path=ThisYearCommand.DisplayName}"></Button>
                 </StackPanel>
             </Expander>
             <Expander IsExpanded="True">
