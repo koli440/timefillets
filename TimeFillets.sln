@@ -16,7 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bin", "Bin", "{72DA4AA9-BC2
 		Bin\Google.GData.Contacts.dll = Bin\Google.GData.Contacts.dll
 		Bin\Google.GData.Documents.dll = Bin\Google.GData.Documents.dll
 		Bin\Google.GData.Extensions.dll = Bin\Google.GData.Extensions.dll
-		Bin\Google.GData.GoogleBase.dll = Bin\Google.GData.GoogleBase.dll
 		Bin\Google.GData.Health.dll = Bin\Google.GData.Health.dll
 		Bin\Google.GData.Photos.dll = Bin\Google.GData.Photos.dll
 		Bin\Google.GData.Spreadsheets.dll = Bin\Google.GData.Spreadsheets.dll
