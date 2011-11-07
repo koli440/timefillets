@@ -12,7 +12,7 @@ namespace TimeFillets.Model
     {
       get
       {
-        return DurationSummary.TotalHours;
+        return Math.Round(DurationSummary.TotalHours, 2);
       }
     }
 
@@ -20,7 +20,7 @@ namespace TimeFillets.Model
     {
       get
       {
-        return DurationSummaryHours / 8;
+        return Math.Round(DurationSummaryHours / 8, 2);
       }
     }
     public int EventsCount { get; set; }
