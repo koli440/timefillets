@@ -150,8 +150,10 @@ namespace TimeFillets.Connectors
 
       EventQuery query = new EventQuery();
       query.Uri = CalendarUrl;
-      query.StartDate = from;
-      query.EndDate = to;
+      query.StartTime = from;
+      query.RecurrenceStart = from;
+      query.EndTime = to;
+      query.RecurrenceEnd = to;
       query.NumberToRetrieve = 1000;
 
       try
@@ -243,6 +245,7 @@ namespace TimeFillets.Connectors
         entry.Locations.Add(new Where() { ValueString = item.Location });
       }
       ReportWork(20);
+      service.setUserCredentials(UserName, Password);
       var ret = CreateCalendarItemFromEventEntry(service.Insert(CalendarUrl, entry));
       ReportWork(100);
       return ret;
